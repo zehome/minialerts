@@ -81,20 +81,6 @@ $.ajaxSetup({
     }
 });
 
-function alert_check(state, id)
-{
-    console.log("Clicked with state "+state+" id="+id);
-
-    $("#btnalert"+id).removeClass("btn-warning").removeClass("btn-success").removeClass("btn-danger").addClass("btn-info").html("<i class=\"icon-refresh\"></i> En cours...");
-    request.done(function(xhr) {
-        console.log("Xhr: "+xhr);
-        $("#btnalert"+id).removeClass("btn-warning").removeClass("btn-danger").removeClass("btn-info").addClass("btn-success").html("Validée");
-    });
-    request.fail(function(xhr, textStatus) {
-        $("#btnalert"+id).removeClass("btn-warning").removeClass("btn-success").removeClass("btn-info").addClass("btn-danger").html("<i class=\"icon-warning-sign\"></i> Erreur!");
-    });
-}
-
 $(document).ready(function() {
     $(".moreinfo").click(function() { 
         var alert_id = $(this).parent().parent().data('alert');
