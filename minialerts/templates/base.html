@@ -1,0 +1,33 @@
+{% load staticfiles %}<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="utf-8">
+    <title>{% block title %}Munin ALERTS{% endblock %}</title>
+    <meta name"viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="author" content="Laurent COUSTET">
+    <link href="{% static "bootstrap/css/bootstrap.css" %}" rel="stylesheet">
+    <style>body { padding-top: 60px; }</style>
+    <link href="{% static "bootstrap/css/bootstrap-responsive.css" %}" rel="stylesheet">
+    <link href="{% static "css/DT_bootstrap.css" %}" rel="stylesheet">
+</head>
+<body>
+    <div class="navbar navbar-fixed-top">
+        <div class="navbar-inner">
+            <div class="container">
+                <div class="brand">
+                    Munin ALERTS {% block header %}{% endblock %}
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="container">
+        {% block content %}{% endblock %}
+    </div>
+    <script src="{% static "js/jquery-1.7.2.min.js" %}"></script>
+    <script src="{% static "bootstrap/js/bootstrap.js" %}"></script>
+    <script src="{% static "js/bootstrap-alert.js" %}"></script>
+    <script src="{% static "datatables/media/js/jquery.dataTables.js" %}"></script>
+    <script src="{% static "js/DT_bootstrap.js" %}"></script>
+    {% block extrajs %}{% endblock %}
+</body>
+</html>

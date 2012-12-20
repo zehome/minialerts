@@ -1,0 +1,119 @@
+{% extends "base.html" %}
+{% block header %}- Dernière mise à jour:
+{{ last_update }} ({{ last_update_delta }}){% endblock %}
+
+{% block content %}
+<div id="alerts"></div>
+<table class="table table-striped table-bordered table-condensed">
+    <thead>
+        <tr>
+            <th>#</th>
+            <th>Date</th>
+            <th>Group</th>
+            <th>Host</th>
+            <th>Category</th>
+            <th>Title</th>
+            <th>Label</th>
+            <th>Value</th>
+            <th>Info. Supp</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for alert in alerts %}
+        <tr class="{{ alert.displayclass }} alertrow" data-alert="{{ alert.id }}">
+            <td>{{ alert.id }}</td>
+            <td>{{ alert.timedelta }}</td>
+            <td>{{ alert.group }}</td>
+            <td>{{ alert.host }}</td>
+            <td>{{ alert.category }}</td>
+            <td>{{ alert.title }}</td>
+            <td>{{ alert.label }}</td>
+            <td>{{ alert.value }}</td>
+            <td>
+            {% if alert.extinfo %}
+                <button class="btn moreinfo">Plus d'info</button>
+            {% endif %}
+            </td>
+            <td>
+                <button class="btn btn-default toggle">Marquer traité</button>
+            </td>
+        </tr>
+        {% if alert.extinfo %}
+        <tr class="hide extinfo" data-alert="{{ alert.id }}">
+            <td colspan="99">{{ alert.extinfo }}</td>
+        </tr>
+        {% endif %}
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}
+
+{% block extrajs %}
+<script>
+// using jQuery
+function getCookie(name) {
+    var cookieValue = null;
+    if (document.cookie && document.cookie != '') {
+        var cookies = document.cookie.split(';');
+        for (var i = 0; i < cookies.length; i++) {
+            var cookie = jQuery.trim(cookies[i]);
+            // Does this cookie string begin with the name we want?
+            if (cookie.substring(0, name.length + 1) == (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+var csrftoken = getCookie('csrftoken');
+function csrfSafeMethod(method) {
+    // these HTTP methods do not require CSRF protection
+    return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+}
+$.ajaxSetup({
+    crossDomain: false, // obviates need for sameOrigin test
+    beforeSend: function(xhr, settings) {
+        if (!csrfSafeMethod(settings.type)) {
+            xhr.setRequestHeader("X-CSRFToken", csrftoken);
+        }
+    }
+});
+
+function alert_check(state, id)
+{
+    console.log("Clicked with state "+state+" id="+id);
+
+    $("#btnalert"+id).removeClass("btn-warning").removeClass("btn-success").removeClass("btn-danger").addClass("btn-info").html("<i class=\"icon-refresh\"></i> En cours...");
+    request.done(function(xhr) {
+        console.log("Xhr: "+xhr);
+        $("#btnalert"+id).removeClass("btn-warning").removeClass("btn-danger").removeClass("btn-info").addClass("btn-success").html("Validée");
+    });
+    request.fail(function(xhr, textStatus) {
+        $("#btnalert"+id).removeClass("btn-warning").removeClass("btn-success").removeClass("btn-info").addClass("btn-danger").html("<i class=\"icon-warning-sign\"></i> Erreur!");
+    });
+}
+
+$(document).ready(function() {
+    $(".moreinfo").click(function() { 
+        var alert_id = $(this).parent().parent().data('alert');
+        $(".extinfo[data-alert="+alert_id+"]").toggleClass('hide');
+    });
+    $(".toggle").click(function() {
+        var btn = $(this);
+        var alert_id = $(this).parent().parent().data('alert');
+        console.log("Toggle." + alert_id);
+        $.ajax({
+            url: "/alerts/toggle/"+alert_id,
+            type: "GET",
+            dataType: 'json'
+        }).done(function() {
+            btn.removeClass("btn-warning").removeClass("btn-danger").removeClass("btn-info").addClass("btn-success").html("Traitée.");
+        }).fail(function() {
+            btn.removeClass("btn-warning").removeClass("btn-success").removeClass("btn-info").addClass("btn-danger").html("<i class=\"icon-warning-sign\"></i> Erreur!");
+        });
+    });
+});
+</script>
+{% endblock %}

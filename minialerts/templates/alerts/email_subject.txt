@@ -1,0 +1,1 @@
+{% autoescape off %}ALERT {{ alert.atype }} {{ alert.host }}@{{ alert.group }}: {{ alert.title }}{% endautoescape %}

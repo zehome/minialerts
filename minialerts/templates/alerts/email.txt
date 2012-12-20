@@ -1,0 +1,25 @@
+{% autoescape off %}Une alerte à été reçue (**{{ alert.atype }}**)
+  - Machine: 		{{ alert.host }}
+  - Groupe:       	{{ alert.group }}
+  - Category:       {{ alert.category }}
+
+Titre de l'alarme: {{ alert.title|striptags|wordwrap:80  }}
+Valeur ayant déclanché l'alarme: {{ alert.label }} {{ alert.value }}
+
++-------------------------------+
+| Informations complémentaires: |
++-------------------------------+
+{% if alert.range %}Bornes de déclanchement: {{ alert.range }}{% endif %}
+{% if alert.extinfo %}{{ alert.extinfo|striptags|wordwrap:80  }}{% endif %}
+
++-------------------------------+
+| Règle de déclanchement        |
++-------------------------------+
+Regexp: {{ alertmatch.regex }}
+Champ:  {{ alertmatch.field }}
+Niveau: {{ alertmatch.level }}
+Emails: {{ alertmatch.getemaillist }}
+
+-- 
+MiniAlerts
+CLARISYS Informatique{% endautoescape %}
