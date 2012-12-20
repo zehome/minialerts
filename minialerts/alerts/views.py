@@ -44,6 +44,7 @@ def push(request):
             category=a["category"], title=a["title"],
             value=a["value"], label=a["label"],
             atype=a["type"], arange=a["range"],
+            ipaddr=a.get("ip", ""),
             extinfo=a["extinfo"])
         for oa in opened_alerts:
             if oa == alert:

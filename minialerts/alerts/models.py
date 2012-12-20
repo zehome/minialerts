@@ -44,6 +44,7 @@ class Alert(models.Model):
     label = models.CharField(max_length=128)
     atype = models.CharField(max_length=4, choices=ATYPES, blank=False)
     arange = models.CharField(max_length=128)
+    ipaddr = models.CharField(max_length=128)
     extinfo = models.TextField(u'Extended inforamtions')
     date = models.DateTimeField(auto_now_add=True, blank=False)
     date_last_tick = models.DateTimeField(auto_now_add=True, auto_now=True,

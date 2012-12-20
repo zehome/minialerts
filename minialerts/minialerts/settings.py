@@ -149,6 +149,6 @@ LOGGING = {
 }
 
 DEFAULT_FROM_EMAIL = "munin@clarisys.fr"
-EMAIL_HOST = '10.31.254.10'
+EMAIL_HOST = '127.0.0.1'
 EMAIL_PORT = 25
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
