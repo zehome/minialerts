@@ -1,46 +1,55 @@
 {% extends "base.html" %}
-{% block header %}- Dernière mise à jour:
-{{ last_update }} ({{ last_update_delta }}){% endblock %}
+{% block header %}Dernière mise à jour:
+{{ last_update }} ({{ last_update_delta }})
+{% endblock %}
 
 {% block content %}
-<div id="alerts"></div>
-<table class="table table-striped table-bordered table-condensed">
+<div class="alert fade in hide notification">
+    <button class="close" type="button"> x </button>
+    <span></span>
+</div>
+
+<table class="table table-striped table-bordered table-condensed table-hover">
     <thead>
         <tr>
             <th>#</th>
             <th>Ancienneté</th>
             <th>Group</th>
             <th>Host</th>
-            <th>Category</th>
             <th>Title</th>
             <th>Label</th>
             <th>Value</th>
-            <th>Info. Supp</th>
-            <th>Action</th>
+            <th>Actions</th>
         </tr>
     </thead>
     <tbody>
         {% for alert in alerts %}
         <tr class="{{ alert.displayclass }} alertrow" data-alert="{{ alert.id }}">
             <td>{{ alert.id }}</td>
-            <td>{{ alert.timedelta }}</td>
+            <td>{{ alert.timedelta }}{% if alert.ignored %}<br>(Muette){% endif %}</td>
             <td>{{ alert.group }}</td>
             <td>{{ alert.host }}{% if alert.ipaddr %}<br>({{ alert.ipaddr }}){% endif %}</td>
-            <td>{{ alert.category }}</td>
             <td>{{ alert.title }}</td>
             <td>{{ alert.label }}</td>
             <td>{{ alert.value }}</td>
             <td>
-            {% if alert.extinfo %}
-                <button class="btn moreinfo">Plus d'info</button>
-            {% endif %}
-            </td>
-            <td>
-                <button class="btn btn-default toggle">Marquer traité</button>
+                <div class="btn-group">
+                <button class="btn btn-info">Action</button>
+                <button class="btn btn-info dropdown-toggle" data-toggle="dropdown">
+                    <span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu">
+                    <li><a href="#toggledone">Traité</a></li>
+                    {% if alert.extinfo %}
+                    <li><a href="#moreinfo">Plus d'informations</a></li>
+                    {% endif %}
+                    <li><a href="#toggleignore">Rendre muette</a></li>
+                </ul>
+                </div>
             </td>
         </tr>
         {% if alert.extinfo %}
-        <tr class="hide extinfo" data-alert="{{ alert.id }}">
+        <tr class="hide extinfo" data-extinfo-alert="{{ alert.id }}">
             <td colspan="99">{{ alert.extinfo }}</td>
         </tr>
         {% endif %}
@@ -81,25 +90,69 @@ $.ajaxSetup({
     }
 });
 
-$(document).ready(function() {
-    $(".moreinfo").click(function() { 
-        var alert_id = $(this).parent().parent().data('alert');
-        $(".extinfo[data-alert="+alert_id+"]").toggleClass('hide');
+function moreinfo(e)
+{
+    var alert_id = $(this).parents("tr").data('alert');
+    e.preventDefault();
+    $("[data-extinfo-alert="+alert_id+"]").toggle();
+}
+
+function toggleignore(e)
+{
+    var alert_row = $(this).parents("tr");
+    var alert_id = alert_row.data('alert');
+    e.preventDefault();
+    $.ajax({
+        url: "/alerts/toggleignore/"+alert_id,
+        type: "GET",
+        dataType: 'json'
+    }).done(function() {
+        raisealert("alert-success", "<strong>Succèss:</strong> Enregistrement terminé.", 3000);
+        alert_row.addClass("success");
+    }).fail(function() {
+        raisealert("alert-error", "<strong>Erreur:</strong> Impossible d'enregistrer.", 5000);
     });
-    $(".toggle").click(function() {
-        var btn = $(this);
-        var alert_id = $(this).parent().parent().data('alert');
-        console.log("Toggle." + alert_id);
-        $.ajax({
-            url: "/alerts/toggle/"+alert_id,
-            type: "GET",
-            dataType: 'json'
-        }).done(function() {
-            btn.removeClass("btn-warning").removeClass("btn-danger").removeClass("btn-info").addClass("btn-success").html("Traitée.");
-        }).fail(function() {
-            btn.removeClass("btn-warning").removeClass("btn-success").removeClass("btn-info").addClass("btn-danger").html("<i class=\"icon-warning-sign\"></i> Erreur!");
-        });
+}
+
+function toggledone(e)
+{
+    var alert_row = $(this).parents("tr");
+    var alert_id = alert_row.data('alert');
+    e.preventDefault();
+    $.ajax({
+        url: "/alerts/toggledone/"+alert_id,
+        type: "GET",
+        dataType: 'json'
+    }).done(function() {
+        raisealert("alert-success", "<strong>Succèss:</strong> Enregistrement terminé.", 3000);
+        alert_row.addClass("success");
+    }).fail(function() {
+        raisealert("alert-error", "<strong>Erreur:</strong> Impossible d'enregistrer.", 5000);
     });
+}
+
+function raisealert(type, message, timeout)
+{
+    // type: "alert-error" "alert-warning" "alert-success"
+    $('.alert .close').live("click", function(e) {
+        $(this).parent().removeClass(type);
+        $(this).parent().hide('fast');
+    });
+    $(".alert").addClass(type);
+    $(".alert").find("span").html( message );
+    $(".alert").show('fast');
+    if (timeout) {
+        setTimeout(function() {
+            $(".alert").hide('fast');
+        }, timeout);
+    }
+}
+
+$(document).ready(function(){
+    $("a[href=#toggledone]").click(toggledone);
+    $("a[href=#moreinfo]").click(moreinfo);
+    $("a[href=#toggleignore]").click(toggleignore);
 });
+
 </script>
 {% endblock %}

@@ -1,0 +1,9 @@
+.notification {
+	position: fixed;
+	bottom: 10px;
+	right: auto;
+	left: auto;
+	z-index: 1030;
+	margin-bottom: 0;
+	box-shadow: 0 0 8px 8px #666;
+}

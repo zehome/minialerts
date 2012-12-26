@@ -51,6 +51,7 @@ class Alert(models.Model):
                                           blank=False)
     date_last_alerted = models.DateTimeField(blank=True, null=True)
     checked = models.BooleanField(default=False, blank=False)
+    ignored = models.BooleanField(default=False, blank=False, null=False)
     email_sent = models.BooleanField(default=False, blank=False)
 
     class Meta:
@@ -60,6 +61,8 @@ class Alert(models.Model):
         return u"%s@%s %s" % (self.host, self.group, self.title)
 
     def displayclass(self):
+        if self.ignored:
+            return "info"
         if self.atype == "critical":
             return "error"
         return self.atype

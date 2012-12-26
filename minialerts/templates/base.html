@@ -9,15 +9,17 @@
     <style>body { padding-top: 60px; }</style>
     <link href="{% static "bootstrap/css/bootstrap-responsive.css" %}" rel="stylesheet">
     <link href="{% static "css/DT_bootstrap.css" %}" rel="stylesheet">
+    <link href="{% static "css/muninalerts.css" %}" rel="stylesheet">
 </head>
 <body>
     <div class="navbar navbar-fixed-top">
         <div class="navbar-inner">
-            <div class="container">
-                <div class="brand">
-                    Munin ALERTS {% block header %}{% endblock %}
-                </div>
-            </div>
+            <div class="brand">Munin ALERTS</div>
+            <ul class="nav">
+                <li><a href="{% url alerts_list %}">Actives</a></li>
+                <li><a href="{% url alerts_list %}?muted=1">Muettes</a></li>
+            </ul>
+            <div class="pull-right">{% block header %}{% endblock %}</div>
         </div>
     </div>
     <div class="container">

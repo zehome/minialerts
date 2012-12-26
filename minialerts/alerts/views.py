@@ -12,6 +12,9 @@ from alerts.models import Alert
 
 def index(request):
     alerts = Alert.objects.filter(checked=False).order_by('atype', '-date_last_tick')
+    if not request.GET.get("muted", 0):
+        alerts = alerts.filter(ignored=False)
+    
     try:
         last_alert = Alert.objects.all().order_by("-date_last_tick")[0]
     except IndexError:
@@ -55,8 +58,14 @@ def push(request):
             alert.save()
     return HttpResponse(200, 'Good!')
 
-def toggle(request, alertid):
+def toggledone(request, alertid):
     alert = get_object_or_404(Alert, pk=alertid)
     alert.checked = not alert.checked
     alert.save()
     return HttpResponse(json.dumps(alert.checked), mimetype="application/json")
+
+def toggleignore(request, alertid):
+    alert = get_object_or_404(Alert, pk=alertid)
+    alert.ignored = not alert.ignored
+    alert.save()
+    return HttpResponse(json.dumps(alert.ignored), mimetype="application/json")

@@ -117,6 +117,7 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'django.contrib.admin',
     'alerts',
+    'south', # python-django-south (database schema migration)
 )
 
 # A sample logging configuration. The only tangible logging
